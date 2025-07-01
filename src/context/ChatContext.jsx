@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useState } from "react";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../baseUrl";
 
 const ChatContext = createContext();
 
@@ -10,7 +11,7 @@ export const ChatContextProvider = ({ children }) => {
 
   async function createChat(id) {
     try {
-      const { data } = await axios.post("/api/messages", {
+      const { data } = await axios.post(`${API_BASE_URL}/api/messages`, {
         recieverId: id,
         message: "hii",
       });

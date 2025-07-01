@@ -1,10 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../../baseUrl";
 
 // Register
 export const registerUser = createAsyncThunk("user/register", async ({ formdata, navigate }) => {
-  const { data } = await axios.post("/api/auth/register", formdata);
+  const { data } = await axios.post(`/${API_BASE_URL}/api/auth/register`, formdata);
   toast.success(data.message);
   // fetchPosts();
   navigate("/");
@@ -13,7 +14,7 @@ export const registerUser = createAsyncThunk("user/register", async ({ formdata,
 
 // Login
 export const loginUser = createAsyncThunk("user/login", async ({ email, password, navigate }) => {
-  const { data } = await axios.post("/api/auth/login", { email, password });
+  const { data } = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
   toast.success(data.message);
   // fetchPosts();
   navigate("/");
@@ -24,13 +25,13 @@ export const loginUser = createAsyncThunk("user/login", async ({ email, password
 
 // Get Me
 export const fetchUser = createAsyncThunk("user/fetch", async () => {
-  const { data } = await axios.get("/api/user/me");
+  const { data } = await axios.get(`${API_BASE_URL}/api/user/me`);
   return data;
 });
 
 // Logout
 export const logoutUser = createAsyncThunk("user/logout", async () => {
-  const { data } = await axios.get("/api/auth/logout");
+  const { data } = await axios.get(`${API_BASE_URL}/api/auth/logout`);
   toast.success(data.message);
   // navigate("/login");
 
@@ -39,7 +40,7 @@ export const logoutUser = createAsyncThunk("user/logout", async () => {
 
 // Follow
 export const followUser = createAsyncThunk("user/follow", async ({ id, fetchUser }) => {
-  const { data } = await axios.post("/api/user/follow/" + id);
+  const { data } = await axios.post(`${API_BASE_URL}/api/user/follow/` + id);
   toast.success(data.message);
   fetchUser();
   return data;
@@ -47,7 +48,7 @@ export const followUser = createAsyncThunk("user/follow", async ({ id, fetchUser
 
 // Update Profile Pic
 export const updateProfilePic = createAsyncThunk("user/updatePic", async ({ id, formdata, setFile, fetchUser }) => {
-  const { data } = await axios.put("/api/user/" + id, formdata);
+  const { data } = await axios.put(`${API_BASE_URL}/api/user/` + id, formdata);
   toast.success(data.message);
   // fetchUser();
   // setFile(null);
@@ -56,7 +57,7 @@ export const updateProfilePic = createAsyncThunk("user/updatePic", async ({ id, 
 
 // Update Name
 export const updateProfileName = createAsyncThunk("user/updateName", async ({ id, name }) => {
-  const { data } = await axios.put("/api/user/" + id, { name });
+  const { data } = await axios.put(`${API_BASE_URL}/api/user/"`+ id, { name });
   toast.success(data.message);
   // fetchUser();
   // setShowInput(false);
@@ -66,7 +67,7 @@ export const updateProfileName = createAsyncThunk("user/updateName", async ({ id
 export const loginWithGoogle = () => async (dispatch) => {
   try {
     // Open Google OAuth in the same tab or popup
-    window.open("http://localhost:7000/api/auth/google", "_self");
+    window.open(`${API_BASE_URL}/api/auth/google`, "_self");
   } catch (error) {
     console.error("Google Login Failed", error);
   }

@@ -1,10 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../../baseUrl";
 
 // Fetch all posts
 export const fetchPosts = createAsyncThunk("post/fetchAll", async () => {
-    const { data } = await axios.get("/api/post/all");
+    const { data } = await axios.get(`${API_BASE_URL}/api/post/all`);
 
     console.log("Data", data);
 
@@ -35,7 +36,7 @@ export const fetchPosts = createAsyncThunk("post/fetchAll", async () => {
 export const addPost = createAsyncThunk(
     "post/add",
     async ({ formdata, type }, { dispatch }) => {
-        const { data } = await axios.post("/api/post/new?type=" + type, formdata);
+        const { data } = await axios.post(`${API_BASE_URL}/api/post/new?type=` + type, formdata);
         toast.success(data.message);
         // dispatch(fetchPosts());
         // setFile(null);
@@ -47,7 +48,7 @@ export const addPost = createAsyncThunk(
 );
 
 // Like post
-export const likePost = createAsyncThunk("post/like", async (id) => {
+export const likePost = createAsyncThunk(`${API_BASE_URL}/post/like`, async (id) => {
     const { data } = await axios.post("/api/post/like/" + id);
     toast.success(data.message);
     // dispatch(fetchPosts());
@@ -58,7 +59,7 @@ export const likePost = createAsyncThunk("post/like", async (id) => {
 export const addComment = createAsyncThunk(
     "post/addComment",
     async ({ id, comment }) => {
-        const { data } = await axios.post("/api/post/comment/" + id, { comment });
+        const { data } = await axios.post(`${API_BASE_URL}/api/post/comment/` + id, { comment });
         toast.success(data.message);
         // dispatch(fetchPosts());
         // setComment("");
@@ -68,7 +69,7 @@ export const addComment = createAsyncThunk(
 );
 
 // Delete post
-export const deletePost = createAsyncThunk("post/delete", async (id) => {
+export const deletePost = createAsyncThunk(`${API_BASE_URL}/post/delete`, async (id) => {
     const { data } = await axios.delete("/api/post/" + id);
     toast.success(data.message);
     // dispatch(fetchPosts());
@@ -79,7 +80,7 @@ export const deletePost = createAsyncThunk("post/delete", async (id) => {
 export const deleteComment = createAsyncThunk(
     "post/deleteComment",
     async ({ id, commentId }) => {
-        const { data } = await axios.delete(`/api/post/comment/${id}?commentId=${commentId}`);
+        const { data } = await axios.delete(`${API_BASE_URL}/api/post/comment/${id}?commentId=${commentId}`);
         toast.success(data.message);
         // dispatch(fetchPosts());
         return data;

@@ -1,7 +1,8 @@
 import { io } from "socket.io-client";
 import { setOnlineUsers, setSocket } from "./socketSlice";
+import { API_BASE_URL } from "../../baseUrl";
 
-const ENDPOINT = "http://localhost:7000";
+const ENDPOINT = `${API_BASE_URL}`;
 
 export const connectSocket = (userId) => async (dispatch) => {
   const socket = io(ENDPOINT, {
