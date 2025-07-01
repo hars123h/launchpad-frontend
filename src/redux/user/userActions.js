@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../../baseUrl";
 
 // Register
 export const registerUser = createAsyncThunk("user/register", async ({ formdata, navigate }) => {
-  const { data } = await axios.post(`/${API_BASE_URL}/api/auth/register`, formdata);
+  const { data } = await axios.post(`${API_BASE_URL}/api/auth/register`, formdata);
   toast.success(data.message);
   // fetchPosts();
   navigate("/");
