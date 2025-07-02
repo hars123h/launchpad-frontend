@@ -44,7 +44,7 @@ const Reels = () => {
       ) : ( */}
       <div className="bg-gray-100">
         <AddPost type="reel" />
-        <div className="flex m-auto gap-3 w-[300px] md:w-[500px]">
+        <div className="flex  w-full gap-2 justify-center items-center ml-7">
           {reels && reels.length > 0 ? (
             <PostCard
               key={reels[index]._id}

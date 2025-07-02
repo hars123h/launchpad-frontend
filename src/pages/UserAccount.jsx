@@ -10,6 +10,7 @@ import Modal from "../components/Modal";
 // import { SocketData } from "../context/SocketContext";
 import { followUser } from "../redux/user/userActions";
 import { useDispatch, useSelector } from "react-redux";
+import { API_BASE_URL } from "../baseUrl";
 
 
 const UserAccount = () => {
@@ -17,7 +18,7 @@ const UserAccount = () => {
   const dispatch = useDispatch();
   const { posts, reels } = useSelector((state) => state.post);
   console.log("postssss", posts);
-  
+
   // const { posts, reels } = PostData();
   const [user, setUser] = useState([]);
   const params = useParams();
@@ -26,7 +27,12 @@ const UserAccount = () => {
 
   async function fetchUser() {
     try {
-      const { data } = await axios.get("/api/user/" + params.id);
+      const { data } = await axios.get(`${API_BASE_URL}/api/user/` + params.id,
+        {
+          withCredentials: true,
+        }
+
+      );
 
       setUser(data);
       setLoading(false);
@@ -96,7 +102,11 @@ const UserAccount = () => {
 
   async function followData() {
     try {
-      const { data } = await axios.get("/api/user/followdata/" + user._id);
+      const { data } = await axios.get(`${API_BASE_URL}/api/user/followdata/` + user._id,
+        {
+          withCredentials: true,
+        }
+      );
 
       setFollowersData(data.followers);
       setFollowingsData(data.followings);
@@ -135,51 +145,59 @@ const UserAccount = () => {
                     setShow={setShow1}
                   />
                 )}
-                <div className="bg-white flex justify-between gap-4 p-8 rounded-lg shadow-md max-w-md">
-                  <div className="image flex flex-col justify-between mb-4 gap-4">
+                <div className="bg-white w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-between gap-8 p-8 rounded-2xl shadow-md">
+                  {/* Profile Image */}
+                  <div className="flex-shrink-0">
                     <img
                       src={user.profilePic.url}
-                      alt=""
-                      className="w-[180px] h-[180px] rounded-full"
+                      alt="Profile"
+                      className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover shadow-md"
                     />
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <p className="flex justify-center items-center text-gray-800 font-semibold">
-                      {user.name}{" "}
+                  {/* User Info */}
+                  <div className="flex-1 flex flex-col gap-3 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                      <p className="text-2xl font-semibold text-gray-800">{user.name}</p>
                       {onlineUsers.includes(user._id) && (
-                        <div className="ml-5 ">
-                          <span className="font-bold text-green-400">
-                            Online
-                          </span>
-                        </div>
+                        <span className="text-sm text-green-500 font-medium bg-green-100 px-2 py-1 rounded-full">
+                          Online
+                        </span>
                       )}
-                    </p>
-                    <p className="text-gray-500 text-sm">{user.email}</p>
-                    <p className="text-gray-500 text-sm">{user.gender}</p>
-                    <p
-                      className="text-gray-500 text-sm cursor-pointer"
-                      onClick={() => setShow(true)}
-                    >
-                      {user.followers.length} follower
-                    </p>
-                    <p
-                      className="text-gray-500 text-sm cursor-pointer"
-                      onClick={() => setShow1(true)}
-                    >
-                      {user.followings.length} following
-                    </p>
+                    </div>
 
-                    {user._id === loggedInUser._id ? (
-                      ""
-                    ) : (
-                      <button
-                        onClick={followHandler}
-                        className={`py-2 px-5 text-white rounded-md ${followed ? "bg-red-500" : "bg-blue-400"
-                          }`}
+                    <p className="text-gray-600 text-sm">{user.email}</p>
+                    <p className="text-gray-600 text-sm capitalize">{user.gender}</p>
+
+                    {/* Followers / Followings */}
+                    <div className="flex justify-center md:justify-start gap-4">
+                      <p
+                        className="text-blue-600 font-medium cursor-pointer hover:underline"
+                        onClick={() => setShow(true)}
                       >
-                        {followed ? "UnFollow" : "Follow"}
-                      </button>
+                        {user.followers.length} Followers
+                      </p>
+                      <p
+                        className="text-blue-600 font-medium cursor-pointer hover:underline"
+                        onClick={() => setShow1(true)}
+                      >
+                        {user.followings.length} Following
+                      </p>
+                    </div>
+
+                    {/* Follow/Unfollow Button */}
+                    {user._id !== loggedInUser._id && (
+                      <div className="mt-4">
+                        <button
+                          onClick={followHandler}
+                          className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${followed
+                            ? "bg-red-500 hover:bg-red-600"
+                            : "bg-blue-500 hover:bg-blue-600"
+                            } text-white`}
+                        >
+                          {followed ? "Unfollow" : "Follow"}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

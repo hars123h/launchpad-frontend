@@ -5,6 +5,7 @@ import { LoadingAnimation } from "../Loading";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
 import { SocketData } from "../../context/SocketContext";
+import { API_BASE_URL } from "../../baseUrl";
 
 const MessageContainer = ({ selectedChat, setChats }) => {
   const [messages, setMessages] = useState([]);
@@ -22,7 +23,10 @@ const MessageContainer = ({ selectedChat, setChats }) => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/api/messages/${selectedChat.users[0]._id}`
+        `${API_BASE_URL}/api/messages/${selectedChat.users[0]._id}`,
+        {
+          withCredentials: true,
+        }
       );
       setMessages(data);
     } catch (error) {
@@ -75,9 +79,9 @@ const MessageContainer = ({ selectedChat, setChats }) => {
   }, [socket, selectedChat, setChats]);
 
   return (
-    <div>
+    <div>  
       {selectedChat && (
-        <div className="flex flex-col">
+        <div className="flex flex-col h-[90vh]">
           {/* Chat Header */}
           <div className="flex w-full h-12 items-center gap-3">
             <img
@@ -95,7 +99,7 @@ const MessageContainer = ({ selectedChat, setChats }) => {
             <>
               <div
                 ref={messageContainerRef}
-                className="flex flex-col gap-4 my-4 h-[400px] overflow-y-auto border border-gray-300 bg-gray-100 p-3"
+                className="flex flex-col gap-4 my-4 h-[90vh] overflow-y-auto border border-gray-300 bg-gray-100 p-3"
               >
                 {messages.map((e) => (
                   <Message

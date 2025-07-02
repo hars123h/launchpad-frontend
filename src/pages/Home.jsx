@@ -20,7 +20,7 @@ const Home = () => {
 
   useEffect(() => {
     if (posts.length === 0) {
-      dispatch(fetchPosts({ type: "post"}));
+      dispatch(fetchPosts({ type: "post" }));
     }
   }, [dispatch]);
 

@@ -5,7 +5,7 @@ const Message = ({ ownMessage, message }) => {
     <div className={`mb-2 ${ownMessage ? "text-right" : "text-left"}`}>
       <span
         className={`inline-block p-2 rounded-lg ${
-          ownMessage ? "bg-blue-500 text-white" : "bg-gray-300 text-black"
+          ownMessage ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-white text-black"
         }`}
       >
         {message}

@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, loginWithGoogle } from "../redux/user/userActions";
 import { fetchPosts } from "../redux/post/postActions.js";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,6 +28,9 @@ const Login = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     // loginUser(email, password, navigate, fetchPosts);
+    if (!email || !password) {
+      return toast.error("All fields are required")
+    }
     dispatch(loginUser({ email, password, navigate }));
 
   };
@@ -35,9 +39,9 @@ const Login = () => {
   };
   return (
     <>
-      {loading ? (
+      {/* {loading ? (
         <h1>Loading...</h1>
-      ) : (
+      ) : ( */}
         <div className="flex justify-center">
           <div className="flex flex-col justify-center items-center md:flex-row shadow-md rounded-xl max-w-7xl w-[90%] md:w-[50%] md:mt-[140px]">
             <div className="w-full md:w-3/4">
@@ -55,7 +59,7 @@ const Login = () => {
                     placeholder="User Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
+
                   />
                   <input
                     type="password"
@@ -63,18 +67,20 @@ const Login = () => {
                     placeholder="User Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
+
                   />
                 </div>
                 <div className="text-center mt-7">
                   <button className="auth-btn">Login</button>
                 </div>
-                <button
-                  onClick={handleGoogleLogin}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md mt-4"
-                >
-                  Continue with Google
-                </button>
+                <div className="w-full flex items-center justify-center ">
+                  <button
+                    onClick={handleGoogleLogin}
+                    className="bg-red-500 text-white px-4 py-2 rounded-md mt-1 mb-5  w-[50%]"
+                  >
+                    Continue with Google
+                  </button>
+                </div>
               </form>
             </div>
 
@@ -92,7 +98,7 @@ const Login = () => {
             </div>
           </div>
         </div>
-      )}
+      {/* )} */}
     </>
   );
 };

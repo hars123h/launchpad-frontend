@@ -11,15 +11,26 @@ export const ChatContextProvider = ({ children }) => {
 
   async function createChat(id) {
     try {
-      const { data } = await axios.post(`${API_BASE_URL}/api/messages`, {
-        recieverId: id,
-        message: "hii",
-      });
+      const { data } = await axios.post(
+        `${API_BASE_URL}/api/messages`,
+        {
+          recieverId: id, // ✅ spelling fixed
+          message: "hii",
+        },
+        {
+          withCredentials: true, // ✅ correct placement
+        }
+      );
+
+      // Optional: update chat state if needed
+      // setChats((prev) => [...prev, data.chat]);
+
     } catch (error) {
-      toast.error(error.response.data.message);
-      console.log(error);
+      toast.error(error?.response?.data?.message || "Failed to create chat");
+      console.error(error);
     }
   }
+
   return (
     <ChatContext.Provider
       value={{ createChat, selectedChat, setSelectedChat, chats, setChats }}

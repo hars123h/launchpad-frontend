@@ -52,7 +52,7 @@ const PostCard = ({ type, value }) => {
     const result = await dispatch(addComment({ id: value?._id, comment }));
     if (addComment.fulfilled.match(result)) {
       setComment("");
-      setShow(false);
+      // setShow(false);
       dispatch(fetchPosts()); // only if needed
     }
   };
@@ -102,12 +102,12 @@ const PostCard = ({ type, value }) => {
     setOpen(false);
   };
 
-  // const { onlineUsers } = SocketData();
-  const { socket, onlineUsers } = useSelector((state) => state.socket);
+  const { onlineUsers } = SocketData();
+  // const { socket, onlineUsers } = useSelector((state) => state.socket);
 
 
   return (
-    <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14 w-[450px]">
+    <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14 min-[867px]:w-[750px]">
       <SimpleModal isOpen={showModal} onClose={closeModal}>
         <LikeModal isOpen={open} onClose={oncloseLIke} id={value._id} />
         <div className="flex flex-col items-center justify-center gap-3">
@@ -126,8 +126,8 @@ const PostCard = ({ type, value }) => {
           </button>
         </div>
       </SimpleModal>
-      <div className="bg-white p-8 rounded-lg shadow-md max-w-md">
-        <div className="flex items-center space-x-2">
+      <div className="bg-white p-8 rounded-lg shadow-md min-[867px]:w-[750px]">
+        <div className="flex items-center space-x-2 justify-between">
           <Link
             className="flex items-center space-x-2"
             to={`/user/${value.owner._id}`}
@@ -138,18 +138,21 @@ const PostCard = ({ type, value }) => {
               className="w-8 h-8 rounded-full"
             />
 
-            {onlineUsers.includes(value.owner._id) && (
-              <div className="text-5xl font-bold text-green-400">.</div>
-            )}
+
 
             <div>
-              <p className="text-gray-800 font-semibold">{value.owner.name}</p>
+              <div className="flex items-center gap-2" >
+                <p className="text-gray-800 font-semibold">{value.owner.name}</p>
+                {onlineUsers.includes(value.owner._id) && (
+                  <div className="w-[10px] h-[10px] rounded-full font-bold bg-green-500 text-green-400"></div>
+                )}
+              </div>
               <div className="text-gray-500 text-sm">{formatDate}</div>
             </div>
           </Link>
 
           {value.owner._id === user._id && (
-            <div className="text-gray-500 cursor-pointer">
+            <div className="text-gray-500 cursor-pointer rotate-90">
               <button
                 onClick={() => setShowModal(true)}
                 className="hover:bg-gray-50 rounded-full p-1 text-2xl"
@@ -187,7 +190,7 @@ const PostCard = ({ type, value }) => {
               </button>
             </>
           ) : (
-            <p className="text-gray-800">{value.caption}</p>
+            <p className="text-gray-800 mt-3">{value.caption}</p>
           )}
         </div>
 
@@ -196,13 +199,13 @@ const PostCard = ({ type, value }) => {
             <img
               src={value.post.url}
               alt=""
-              className="object-cover rounded-md w-[350px] h-auto"
+              className="object-cover rounded-md min-[867px]:w-[650px] h-auto"
             />
           ) : (
             <video
               src={value.post.url}
               alt=""
-              className="w-[450px] h-[600px] object-cover rounded-md"
+              className="min-[867px]:w-[650px] h-auto object-cover rounded-md"
               autoPlay
               controls
             />
@@ -232,40 +235,44 @@ const PostCard = ({ type, value }) => {
           </button>
         </div>
         {show && (
-          <form onSubmit={addCommentHandler} className="flex gap-3">
-            <input
-              type="text"
-              className="custom-input"
-              placeholder="Enter Comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-            <button className="bg-gray-100 rounded-lg px-5 py-2" type="submit">
-              Add
-            </button>
-          </form>
+          <>
+            <form onSubmit={addCommentHandler} className="flex gap-3">
+              <input
+                type="text"
+                className="custom-input"
+                placeholder="Enter Comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+              <button className="bg-gray-100 rounded-lg px-5 py-2" type="submit">
+                Add
+              </button>
+            </form>
+
+            <hr className="mt-2 mb-2" />
+            <p className="text-gray-800 font-semibold">Comments</p>
+            <hr className="mt-2 mb-2" />
+            <div className="mt-4">
+              <div className="comments max-h-[200px] overflow-y-auto">
+                {value.comments && value.comments.length > 0 ? (
+                  value.comments.map((e) => (
+                    <Comment
+                      value={e}
+                      key={e._id}
+                      user={user}
+                      owner={value.owner._id}
+                      id={value._id}
+                    />
+                  ))
+                ) : (
+                  <p>No Comments</p>
+                )}
+              </div>
+            </div>
+          </>
         )}
 
-        <hr className="mt-2 mb-2" />
-        <p className="text-gray-800 font-semibold">Comments</p>
-        <hr className="mt-2 mb-2" />
-        <div className="mt-4">
-          <div className="comments max-h-[200px] overflow-y-auto">
-            {value.comments && value.comments.length > 0 ? (
-              value.comments.map((e) => (
-                <Comment
-                  value={e}
-                  key={e._id}
-                  user={user}
-                  owner={value.owner._id}
-                  id={value._id}
-                />
-              ))
-            ) : (
-              <p>No Comments</p>
-            )}
-          </div>
-        </div>
+
       </div>
     </div>
   );

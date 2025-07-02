@@ -17,6 +17,8 @@ import { fetchUser } from "./redux/user/userActions";
 import axios from "axios";
 import { fetchPosts } from "./redux/post/postActions.js";
 import { connectSocket } from "./redux/socket/socketActions";
+import { Toaster } from "react-hot-toast";
+
 
 
 const App = () => {
@@ -61,6 +63,17 @@ const App = () => {
       {/* {loading ? (
         <Loading />
       ) : ( */}
+
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+      />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={isAuth ? <Home posts={posts} postsCursor={postsCursor} /> : <Login />} />

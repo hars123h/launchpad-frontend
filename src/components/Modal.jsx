@@ -3,37 +3,43 @@ import { Link } from "react-router-dom";
 
 const Modal = ({ value, title, setShow }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-      <div className="bg-white rounded-lg p-4 shadow-lg w-[300px] max-h-[300px] overflow-y-auto">
-        <h1 className="text-2xl text-blue-600">{title}</h1>
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShow(false)}
-            className="text-gray-500 text-2xl"
-          >
-            &times;
-          </button>
-        </div>
-        <div className="flex flex-col space-y-2 mt-2">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto p-6 relative">
+        {/* Close Button */}
+        <button
+          onClick={() => setShow(false)}
+          className="absolute top-3 right-4 text-2xl text-gray-400 hover:text-red-500 transition"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+
+        {/* Modal Title */}
+        <h2 className="text-xl font-semibold text-blue-600 mb-4 text-center">
+          {title}
+        </h2>
+
+        {/* List */}
+        <div className="flex flex-col gap-3">
           {value && value.length > 0 ? (
             value.map((e, i) => (
               <Link
-                className="bg-gray-500 py-2 px-3 text-white text-center rounded-md flex justify-center items-center gap-4"
                 to={`/user/${e._id}`}
                 key={i}
                 onClick={() => setShow(false)}
+                className="flex items-center gap-3 p-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all"
               >
-                {i + 1}{" "}
+                <span className="text-sm text-gray-700 font-medium">{i + 1}.</span>
                 <img
-                  className="w-8 h-8 rounded-full"
                   src={e.profilePic.url}
-                  alt=""
+                  alt={e.name}
+                  className="w-10 h-10 rounded-full object-cover"
                 />
-                {e.name}
+                <span className="text-gray-800 font-medium">{e.name}</span>
               </Link>
             ))
           ) : (
-            <p>No {title} yet</p>
+            <p className="text-gray-500 text-center">No {title} yet</p>
           )}
         </div>
       </div>

@@ -5,42 +5,69 @@ import { API_BASE_URL } from "../../baseUrl";
 
 // Register
 export const registerUser = createAsyncThunk("user/register", async ({ formdata, navigate }) => {
-  const { data } = await axios.post(`${API_BASE_URL}/api/auth/register`, formdata);
-  toast.success(data.message);
-  // fetchPosts();
-  navigate("/");
-  return data;
+  try {
+    const { data } = await axios.post(`${API_BASE_URL}/api/auth/register`, formdata, {
+      withCredentials: true
+    });
+    toast.success(data.message);
+    navigate("/");
+    return data;
+  } catch (err) {
+    const errorMsg = err?.response?.data?.message || "Register  failed";
+    toast.error(errorMsg);
+
+    // Pass error to rejected action
+    return rejectWithValue(errorMsg);
+  }
+
 });
 
 // Login
-export const loginUser = createAsyncThunk("user/login", async ({ email, password, navigate }) => {
-  const { data } = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
-  toast.success(data.message);
-  // fetchPosts();
-  navigate("/");
-  // console.log("Dataaaa", data)
+export const loginUser = createAsyncThunk(
+  "user/login",
+  async ({ email, password, navigate }, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post(
+        `${API_BASE_URL}/api/auth/login`,
+        { email, password },
+        { withCredentials: true }
+      );
+      toast.success(data.message);
+      navigate("/");
+      return data;
+    } catch (error) {
+      // Show error toast
+      const errorMsg = error.response?.data?.message || "Login failed";
+      toast.error(errorMsg);
 
-  return data;
-});
+      // Pass error to rejected action
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
 
 // Get Me
 export const fetchUser = createAsyncThunk("user/fetch", async () => {
-  const { data } = await axios.get(`${API_BASE_URL}/api/user/me`);
+  const { data } = await axios.get(`${API_BASE_URL}/api/user/me`, {
+    withCredentials: true
+  });
   return data;
 });
 
 // Logout
 export const logoutUser = createAsyncThunk("user/logout", async () => {
-  const { data } = await axios.get(`${API_BASE_URL}/api/auth/logout`);
+  const { data } = await axios.get(`${API_BASE_URL}/api/auth/logout`, {
+    withCredentials: true
+  });
   toast.success(data.message);
-  // navigate("/login");
-
   return data;
 });
 
 // Follow
 export const followUser = createAsyncThunk("user/follow", async ({ id, fetchUser }) => {
-  const { data } = await axios.post(`${API_BASE_URL}/api/user/follow/` + id);
+  const { data } = await axios.post(`${API_BASE_URL}/api/user/follow/${id}`, null, {
+    withCredentials: true
+  });
   toast.success(data.message);
   fetchUser();
   return data;
@@ -48,25 +75,25 @@ export const followUser = createAsyncThunk("user/follow", async ({ id, fetchUser
 
 // Update Profile Pic
 export const updateProfilePic = createAsyncThunk("user/updatePic", async ({ id, formdata, setFile, fetchUser }) => {
-  const { data } = await axios.put(`${API_BASE_URL}/api/user/` + id, formdata);
+  const { data } = await axios.put(`${API_BASE_URL}/api/user/${id}`, formdata, {
+    withCredentials: true
+  });
   toast.success(data.message);
-  // fetchUser();
-  // setFile(null);
   return data;
 });
 
 // Update Name
 export const updateProfileName = createAsyncThunk("user/updateName", async ({ id, name }) => {
-  const { data } = await axios.put(`${API_BASE_URL}/api/user/"`+ id, { name });
+  const { data } = await axios.put(`${API_BASE_URL}/api/user/${id}`, { name }, {
+    withCredentials: true
+  });
   toast.success(data.message);
-  // fetchUser();
-  // setShowInput(false);
   return data;
 });
 
+// Google OAuth Login
 export const loginWithGoogle = () => async (dispatch) => {
   try {
-    // Open Google OAuth in the same tab or popup
     window.open(`${API_BASE_URL}/api/auth/google`, "_self");
   } catch (error) {
     console.error("Google Login Failed", error);

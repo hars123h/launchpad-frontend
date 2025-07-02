@@ -14,27 +14,35 @@ const Chat = ({ chat, setSelectedChat, isOnline }) => {
     <div>
       {user && (
         <div
-          className="bg-gray-200 py-2 px-1 rounded-md cursor-pointer mt-3"
+          className="bg-white hover:bg-gray-100 transition-all duration-200 px-4 py-3 rounded-lg shadow-sm cursor-pointer mt-3 h-20 flex items-center gap-3"
           onClick={() => setSelectedChat(chat)}
         >
-          <div className="flex justify-center items-center gap-2">
-            {isOnline && (
-              <div className="text-5xl font-bold text-green-400">.</div>
-            )}
+          {/* Avatar */}
+          <div className="relative">
             <img
               src={user.profilePic.url}
-              alt=""
-              className="w-8 h-8 rounded-full"
+              alt={user.name}
+              className="w-10 h-10 rounded-full object-cover"
             />
-            <span>{user.name}</span>
+            {isOnline && (
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+            )}
           </div>
 
-          <span className="flex justify-center items-center gap-1 text-sm text-gray-700">
-            {loggedInUser._id === chat.latestMessage?.sender ? (
-              <BsSendCheck />
-            ) : null}
-            {chat.latestMessage?.text?.slice(0, 18)}...
-          </span>
+          {/* Name + Message */}
+          <div className="flex flex-col justify-center w-full overflow-hidden">
+            <span className="font-medium text-gray-800 truncate">{user.name}</span>
+            <span className="text-sm text-gray-600 flex items-center gap-1 truncate">
+              {loggedInUser._id === chat.latestMessage?.sender && (
+                <BsSendCheck className="text-blue-500" />
+              )}
+              {chat.latestMessage?.text
+                ? chat.latestMessage.text.length > 30
+                  ? chat.latestMessage.text.slice(0, 30) + "..."
+                  : chat.latestMessage.text
+                : "No messages yet"}
+            </span>
+          </div>
         </div>
       )}
     </div>
