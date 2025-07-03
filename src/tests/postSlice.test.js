@@ -15,6 +15,7 @@ const initialState = {
   fetchLoading: false,
   addLoading: false,
   hasMore: true,
+  nextCursor: null,
 };
 
 describe('postSlice reducer', () => {
@@ -29,19 +30,53 @@ describe('postSlice reducer', () => {
     expect(state.fetchLoading).toBe(true);
   });
 
-  it('should handle fetchPosts.fulfilled', () => {
+  it('should handle fetchPosts.fulfilled with fresh load (no cursor)', () => {
     const action = {
       type: fetchPosts.fulfilled.type,
       payload: {
         posts: [{ id: 1, title: 'Post 1' }],
-        reels: [{ id: 2, title: 'Reel 1' }]
-      }
+        reels: [{ id: 2, title: 'Reel 1' }],
+        nextCursor: 'cursor_123',
+        hasMore: true
+      },
+      meta: { arg: { cursor: null } }
     };
 
     const state = postReducer({ ...initialState, fetchLoading: true }, action);
     expect(state.fetchLoading).toBe(false);
     expect(state.posts).toEqual([{ id: 1, title: 'Post 1' }]);
     expect(state.reels).toEqual([{ id: 2, title: 'Reel 1' }]);
+    expect(state.nextCursor).toBe('cursor_123');
+    expect(state.hasMore).toBe(true);
+  });
+
+  it('should handle fetchPosts.fulfilled with pagination (cursor present)', () => {
+    const prevState = {
+      ...initialState,
+      posts: [{ id: 1, title: 'Old Post' }],
+      fetchLoading: true
+    };
+
+    const action = {
+      type: fetchPosts.fulfilled.type,
+      payload: {
+        posts: [{ id: 2, title: 'New Post' }],
+        reels: [],
+        nextCursor: 'cursor_456',
+        hasMore: false
+      },
+      meta: { arg: { cursor: 'cursor_123' } }
+    };
+
+    const state = postReducer(prevState, action);
+    expect(state.posts).toEqual([
+      { id: 1, title: 'Old Post' },
+      { id: 2, title: 'New Post' }
+    ]);
+    expect(state.reels).toEqual([]);
+    expect(state.nextCursor).toBe('cursor_456');
+    expect(state.hasMore).toBe(false);
+    expect(state.fetchLoading).toBe(false);
   });
 
   it('should handle fetchPosts.rejected', () => {

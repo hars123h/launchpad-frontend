@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import {
   fetchPosts,
   likePost,
@@ -10,7 +11,6 @@ import {
   addPost
 } from '../redux/post/postActions.js';
 
-// Mock axios and toast for all tests
 vi.mock('axios');
 vi.mock('react-hot-toast');
 
@@ -20,23 +20,33 @@ describe('Post Actions', () => {
   beforeEach(() => {
     store = configureStore({
       reducer: {
-        post: () => ({}) // minimal reducer stub for async thunk testing
+        post: () => ({})
       }
     });
-    vi.clearAllMocks(); // clean mocks before each test
+    vi.clearAllMocks();
   });
 
   describe('fetchPosts', () => {
     it('dispatches fulfilled action on success', async () => {
       const mockData = {
         posts: [{ id: 1, title: 'Test Post' }],
-        reels: []
+        reels: [],
+        hasMore: false,
+        nextCursor: null
       };
+
       axios.get.mockResolvedValueOnce({ data: mockData });
 
-      const result = await store.dispatch(fetchPosts());
+      const result = await store.dispatch(fetchPosts({ cursor: null, limit: 5 }));
 
-      expect(axios.get).toHaveBeenCalledWith('/api/post/all');
+      expect(axios.get).toHaveBeenCalledWith(
+        expect.stringContaining('/api/post/all'),
+        {
+          params: { cursor: null, limit: 5, type: 'post' },
+          withCredentials: true
+        }
+      );
+
       expect(result.type).toBe('post/fetchAll/fulfilled');
       expect(result.payload).toEqual(mockData);
     });
@@ -44,7 +54,7 @@ describe('Post Actions', () => {
     it('dispatches rejected action on failure', async () => {
       axios.get.mockRejectedValueOnce(new Error('Network Error'));
 
-      const result = await store.dispatch(fetchPosts());
+      const result = await store.dispatch(fetchPosts({ cursor: null, limit: 5 }));
 
       expect(result.type).toBe('post/fetchAll/rejected');
       expect(result.error.message).toBe('Network Error');
@@ -62,7 +72,12 @@ describe('Post Actions', () => {
 
       const result = await store.dispatch(addPost({ formdata, type: 'post' }));
 
-      expect(axios.post).toHaveBeenCalledWith('/api/post/new?type=post', formdata);
+      expect(axios.post).toHaveBeenCalledWith(
+        expect.stringContaining('/api/post/new?type=post'),
+        formdata,
+        { withCredentials: true }
+      );
+
       expect(toast.success).toHaveBeenCalledWith('Created');
       expect(result.type).toBe('post/add/fulfilled');
       expect(result.payload).toEqual(mockResponse);
@@ -87,7 +102,12 @@ describe('Post Actions', () => {
 
       const result = await store.dispatch(likePost(1));
 
-      expect(axios.post).toHaveBeenCalledWith('/api/post/like/1');
+      expect(axios.post).toHaveBeenCalledWith(
+        expect.stringContaining('/api/post/like/1'),
+        null,
+        { withCredentials: true }
+      );
+
       expect(toast.success).toHaveBeenCalledWith('Liked');
       expect(result.payload).toEqual(mockResponse);
     });
@@ -101,7 +121,12 @@ describe('Post Actions', () => {
 
       const result = await store.dispatch(addComment({ id: 1, comment: 'Nice!' }));
 
-      expect(axios.post).toHaveBeenCalledWith('/api/post/comment/1', { comment: 'Nice!' });
+      expect(axios.post).toHaveBeenCalledWith(
+        expect.stringContaining('/api/post/comment/1'),
+        { comment: 'Nice!' },
+        { withCredentials: true }
+      );
+
       expect(toast.success).toHaveBeenCalledWith('Commented');
       expect(result.payload).toEqual(mockResponse);
     });
@@ -115,7 +140,11 @@ describe('Post Actions', () => {
 
       const result = await store.dispatch(deletePost(1));
 
-      expect(axios.delete).toHaveBeenCalledWith('/api/post/1');
+      expect(axios.delete).toHaveBeenCalledWith(
+        expect.stringContaining('/api/post/1'),
+        { withCredentials: true }
+      );
+
       expect(toast.success).toHaveBeenCalledWith('Deleted');
       expect(result.payload).toEqual(mockResponse);
     });
@@ -129,7 +158,11 @@ describe('Post Actions', () => {
 
       const result = await store.dispatch(deleteComment({ id: 1, commentId: 2 }));
 
-      expect(axios.delete).toHaveBeenCalledWith('/api/post/comment/1?commentId=2');
+      expect(axios.delete).toHaveBeenCalledWith(
+        expect.stringContaining('/api/post/comment/1?commentId=2'),
+        { withCredentials: true }
+      );
+
       expect(toast.success).toHaveBeenCalledWith('Comment Deleted');
       expect(result.payload).toEqual(mockResponse);
     });

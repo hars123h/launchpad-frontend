@@ -110,7 +110,7 @@ const PostCard = ({ type, value }) => {
 
 
   return (
-    <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14 min-[867px]:w-[750px]">
+    <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14 w-[100%] min-[867px]:w-[750px]">
       <SimpleModal isOpen={showModal} onClose={closeModal}>
         <LikeModal isOpen={open} onClose={oncloseLIke} id={value._id} />
         <div className="flex flex-col items-center justify-center gap-3">
@@ -129,7 +129,7 @@ const PostCard = ({ type, value }) => {
           </button>
         </div>
       </SimpleModal>
-      <div className="bg-white p-8 rounded-lg shadow-md min-[867px]:w-[750px]">
+      <div className="bg-white p-8 rounded-lg shadow-md w-[90%] min-[867px]:w-[750px]">
         <div className="flex items-center space-x-2 justify-between">
           <Link
             className="flex items-center space-x-2"
@@ -210,7 +210,7 @@ const PostCard = ({ type, value }) => {
             <img
               src={value.post.url}
               alt=""
-              className="object-cover rounded-md min-[867px]:w-[650px] h-auto"
+              className="object-cover rounded-md w-[100%] min-[867px]:w-[650px] h-auto"
             />
           ) : (
             <video

@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 
 import {
   registerUser,
@@ -33,11 +33,15 @@ describe("User Actions", () => {
     axios.post.mockResolvedValueOnce({ data: mockResponse });
 
     const navigate = vi.fn();
-    toast.success.mockImplementation(() => {});
+    toast.success.mockImplementation(() => { });
 
     const result = await store.dispatch(registerUser({ formdata: {}, navigate }));
 
-    expect(axios.post).toHaveBeenCalledWith("/api/auth/register", {});
+    expect(axios.post).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/register"),
+      {},
+      { withCredentials: true }
+    );
     expect(toast.success).toHaveBeenCalledWith("Registered");
     expect(navigate).toHaveBeenCalledWith("/");
     expect(result.payload).toEqual(mockResponse);
@@ -48,11 +52,15 @@ describe("User Actions", () => {
     axios.post.mockResolvedValueOnce({ data: mockResponse });
 
     const navigate = vi.fn();
-    toast.success.mockImplementation(() => {});
+    toast.success.mockImplementation(() => { });
 
     const result = await store.dispatch(loginUser({ email: "test@test.com", password: "pass", navigate }));
 
-    expect(axios.post).toHaveBeenCalledWith("/api/auth/login", { email: "test@test.com", password: "pass" });
+    expect(axios.post).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/login"),
+      { email: "test@test.com", password: "pass" },
+      { withCredentials: true }
+    );
     expect(toast.success).toHaveBeenCalledWith("Logged in");
     expect(navigate).toHaveBeenCalledWith("/");
     expect(result.payload).toEqual(mockResponse);
@@ -64,18 +72,24 @@ describe("User Actions", () => {
 
     const result = await store.dispatch(fetchUser());
 
-    expect(axios.get).toHaveBeenCalledWith("/api/user/me");
+    expect(axios.get).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/me"),
+      { withCredentials: true }
+    );
     expect(result.payload).toEqual(mockResponse);
   });
 
   it("logs out user successfully", async () => {
     const mockResponse = { message: "Logged out" };
     axios.get.mockResolvedValueOnce({ data: mockResponse });
-    toast.success.mockImplementation(() => {});
+    toast.success.mockImplementation(() => { });
 
     const result = await store.dispatch(logoutUser());
 
-    expect(axios.get).toHaveBeenCalledWith("/api/auth/logout");
+    expect(axios.get).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/logout"),
+      { withCredentials: true }
+    );
     expect(toast.success).toHaveBeenCalledWith("Logged out");
     expect(result.payload).toEqual(mockResponse);
   });
@@ -84,11 +98,15 @@ describe("User Actions", () => {
     const mockResponse = { message: "Followed" };
     const fetchUserMock = vi.fn();
     axios.post.mockResolvedValueOnce({ data: mockResponse });
-    toast.success.mockImplementation(() => {});
+    toast.success.mockImplementation(() => { });
 
     const result = await store.dispatch(followUser({ id: 1, fetchUser: fetchUserMock }));
 
-    expect(axios.post).toHaveBeenCalledWith("/api/user/follow/1");
+    expect(axios.post).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/follow/1"),
+      null,
+      { withCredentials: true }
+    );
     expect(fetchUserMock).toHaveBeenCalled();
     expect(toast.success).toHaveBeenCalledWith("Followed");
     expect(result.payload).toEqual(mockResponse);
@@ -97,11 +115,20 @@ describe("User Actions", () => {
   it("updates profile picture", async () => {
     const mockResponse = { message: "Updated Pic" };
     axios.put.mockResolvedValueOnce({ data: mockResponse });
-    toast.success.mockImplementation(() => {});
+    toast.success.mockImplementation(() => { });
 
-    const result = await store.dispatch(updateProfilePic({ id: 1, formdata: {}, fetchUser: vi.fn(), setFile: vi.fn() }));
+    const result = await store.dispatch(updateProfilePic({
+      id: 1,
+      formdata: {},
+      fetchUser: vi.fn(),
+      setFile: vi.fn()
+    }));
 
-    expect(axios.put).toHaveBeenCalledWith("/api/user/1", {});
+    expect(axios.put).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/1"),
+      {},
+      { withCredentials: true }
+    );
     expect(toast.success).toHaveBeenCalledWith("Updated Pic");
     expect(result.payload).toEqual(mockResponse);
   });
@@ -109,11 +136,18 @@ describe("User Actions", () => {
   it("updates profile name", async () => {
     const mockResponse = { message: "Updated Name" };
     axios.put.mockResolvedValueOnce({ data: mockResponse });
-    toast.success.mockImplementation(() => {});
+    toast.success.mockImplementation(() => { });
 
-    const result = await store.dispatch(updateProfileName({ id: 1, name: "Harsh Tripathi" }));
+    const result = await store.dispatch(updateProfileName({
+      id: 1,
+      name: "Harsh Tripathi"
+    }));
 
-    expect(axios.put).toHaveBeenCalledWith("/api/user/1", { name: "Harsh Tripathi" });
+    expect(axios.put).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/1"),
+      { name: "Harsh Tripathi" },
+      { withCredentials: true }
+    );
     expect(toast.success).toHaveBeenCalledWith("Updated Name");
     expect(result.payload).toEqual(mockResponse);
   });
