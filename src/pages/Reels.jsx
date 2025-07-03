@@ -14,9 +14,11 @@ const Reels = () => {
   const dispatch = useDispatch();
   const { reels, loading } = useSelector((state) => state.post);
 
-  // useEffect(() => {
-  //   // dispatch(fetchPosts());
-  // }, [dispatch]);
+  useEffect(() => {
+    if (reels.length === 0) {
+      dispatch(fetchPosts({ type: "reel" }));
+    }
+  }, [dispatch]);
   const [index, setIndex] = useState(0);
 
   const prevReel = () => {
@@ -44,17 +46,14 @@ const Reels = () => {
       ) : ( */}
       <div className="bg-gray-100">
         <AddPost type="reel" />
-        <div className="flex  w-full gap-2 justify-center items-center ml-7">
+        <div className="flex  w-full gap-2 justify-center items-center flex-col ">
           {reels && reels.length > 0 ? (
-            <PostCard
-              key={reels[index]._id}
-              value={reels[index]}
-              type={"reel"}
-            />
+            reels?.map((e) => <PostCard key={e._id} value={e} type={"reel"} />)
+
           ) : (
             <p>No reels yet</p>
           )}
-          <div className="button flex flex-col justify-center items-center gap-6">
+          {/* <div className="button flex flex-col justify-center items-center gap-6">
             {index === 0 ? (
               ""
             ) : (
@@ -75,7 +74,7 @@ const Reels = () => {
                 <FaArrowDownLong />
               </button>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
       {/* )} */}

@@ -4,12 +4,24 @@ import toast from "react-hot-toast";
 import { API_BASE_URL } from "../../baseUrl";
 
 // Fetch all posts
-export const fetchPosts = createAsyncThunk("post/fetchAll", async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/post/all`, {
-        withCredentials: true,
-    });
+// export const fetchPosts = createAsyncThunk("post/fetchAll", async () => {
+//     const { data } = await axios.get(`${API_BASE_URL}/api/post/all`, {
+//         withCredentials: true,
+//     });
 
-    console.log("Data", data);
+//     console.log("Data", data);
+//     return data;
+// });
+
+export const fetchPosts = createAsyncThunk("post/fetchAll", async ({ cursor, limit = 5 }) => {
+    const { data } = await axios.get(
+        `${API_BASE_URL}/api/post/all`,
+        {
+            params: { cursor, limit, type: "post" },
+            withCredentials: true,
+        }
+    );
+
     return data;
 });
 

@@ -32,7 +32,7 @@ const AddPost = ({ type }) => {
     const result = await dispatch(addPost({ formdata, type }));
 
     if (addPost.fulfilled.match(result)) {
-      dispatch(fetchPosts());
+      dispatch(fetchPosts({ cursor: null }));
       setFile(null);
       setFilePrev("");
       setCaption("");

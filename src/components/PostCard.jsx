@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { deleteComment } from "../redux/post/postSlice";
 
 import { addComment, deleteComment, deletePost, fetchPosts, likePost } from "../redux/post/postActions.js";
+import { API_BASE_URL } from "../baseUrl.js";
 
 
 const PostCard = ({ type, value }) => {
@@ -40,7 +41,7 @@ const PostCard = ({ type, value }) => {
     // dispatch(likePost(value._id));
     const result = await dispatch(likePost(value._id));
     if (likePost.fulfilled.match(result)) {
-      dispatch(fetchPosts()); // only if needed
+      dispatch(fetchPosts({ cursor: null })); // only if needed
     }
   };
 
@@ -53,7 +54,7 @@ const PostCard = ({ type, value }) => {
     if (addComment.fulfilled.match(result)) {
       setComment("");
       // setShow(false);
-      dispatch(fetchPosts()); // only if needed
+      dispatch(fetchPosts({ cursor: null })); // only if needed
     }
   };
 
@@ -66,7 +67,7 @@ const PostCard = ({ type, value }) => {
   const deleteHandler = async () => {
     const result = await dispatch(deletePost(value?._id));
     if (deletePost.fulfilled.match(result)) {
-      dispatch(fetchPosts()); // only if needed
+      dispatch(fetchPosts({ cursor: null })); // only if needed
     }
   };
 
@@ -82,16 +83,18 @@ const PostCard = ({ type, value }) => {
   async function updateCaption() {
     setCaptionLoading(true);
     try {
-      const { data } = await axios.put("/api/post/" + value._id, { caption });
+      const { data } = await axios.put(
+        `${API_BASE_URL}/api/post/${value._id}`,
+        { caption },
+        { withCredentials: true }  // ✅ Include cookies like auth token
+      );
 
       toast.success(data.message);
-      // fetchPosts();
-      dispatch(fetchPosts());
-
+      dispatch(fetchPosts({ cursor: null }));
       setShowInput(false);
-      setCaptionLoading(false);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Update failed");
+    } finally {
       setCaptionLoading(false);
     }
   }
@@ -163,10 +166,18 @@ const PostCard = ({ type, value }) => {
           )}
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 mt-4">
           {showInput ? (
             <>
-              <input
+              <textarea
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none w-full"
+                placeholder="Enter Caption"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                rows={3}
+              ></textarea>
+
+              {/* <input
                 className="custom-input"
                 style={{ width: "150px" }}
                 type="text"
@@ -174,16 +185,16 @@ const PostCard = ({ type, value }) => {
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 required
-              />
+              /> */}
               <button
                 onClick={updateCaption}
-                className="text-sm bg-blue-500 text-white px-1 py-1 rounded-md"
+                className="text-sm bg-gradient-to-r from-indigo-500 to-violet-500 text-white px-6 py-1 rounded-md"
                 disabled={captionLoading}
               >
                 {captionLoading ? <LoadingAnimation /> : "Update Caption"}
               </button>
               <button
-                className="text-sm bg-red-500 text-white px-1 py-1 rounded-md"
+                className="text-sm bg-red-500 text-white px-6 py-1 ml-2 rounded-md"
                 onClick={() => setShowInput(false)}
               >
                 X
@@ -289,7 +300,7 @@ export const Comment = ({ value, user, owner, id }) => {
     const result = await dispatch(deleteComment({ id: id, commentId: value._id }));
 
     if (deleteComment.fulfilled.match(result)) {
-      dispatch(fetchPosts()); // only if needed
+      dispatch(fetchPosts({ cursor: null })); // only if needed
     }
   };
   return (
