@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateChatLatestMessage } from "../../redux/chat/chatSlice";
 import { API_BASE_URL } from "../../baseUrl";
+import PropTypes from "prop-types";
+
 
 const MessageInput = ({ setMessages, selectedChat }) => {
   const [textMsg, setTextMsg] = useState("");
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.user);
   const handleMessage = async (e) => {
     e.preventDefault();
     try {
@@ -40,7 +41,7 @@ const MessageInput = ({ setMessages, selectedChat }) => {
   };
   return (
     <div>
-      <form onSubmit={handleMessage} className="flex justify-between gap-2 mt-2">
+      <form onSubmit={handleMessage} className="flex justify-between gap-2 mt-2 z-[101]">
         <input
           type="text"
           placeholder="Enter Message"
@@ -58,6 +59,22 @@ const MessageInput = ({ setMessages, selectedChat }) => {
       </form>
     </div>
   );
+};
+
+MessageInput.propTypes = {
+  setMessages: PropTypes.func.isRequired,
+  selectedChat: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    users: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        name: PropTypes.string,
+        profilePic: PropTypes.shape({
+          url: PropTypes.string,
+        }),
+      })
+    ).isRequired,
+  }).isRequired,
 };
 
 export default MessageInput;

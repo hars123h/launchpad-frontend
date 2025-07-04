@@ -6,19 +6,14 @@ import Message from "./Message";
 import MessageInput from "./MessageInput";
 import { SocketData } from "../../context/SocketContext";
 import { API_BASE_URL } from "../../baseUrl";
+import PropTypes from "prop-types";
 
 const MessageContainer = ({ selectedChat, setChats }) => {
   const [messages, setMessages] = useState([]);
   const { user } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const { socket } = SocketData();
-  // const { socket, onlineUsers } = useSelector((state) => state.socket);
-
-
-
   const messageContainerRef = useRef(null);
-
-  // Fetch messages from API
   const fetchMessages = async () => {
     setLoading(true);
     try {
@@ -36,14 +31,12 @@ const MessageContainer = ({ selectedChat, setChats }) => {
     }
   };
 
-  // Fetch messages when selectedChat changes
   useEffect(() => {
     if (selectedChat) {
       fetchMessages();
     }
   }, [selectedChat]);
 
-  // Scroll to latest message when messages change
   useEffect(() => {
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop =
@@ -51,37 +44,44 @@ const MessageContainer = ({ selectedChat, setChats }) => {
     }
   }, [messages]);
 
-  // Listen to socket events
   useEffect(() => {
-    const handleNewMessage = (message) => {
-      if (selectedChat._id === message.chatId) {
-        setMessages((prev) => [...prev, message]);
-      }
+    socket.on("newMessage", handleNewMessageWrapper);
 
-      setChats((prev) =>
-        prev.map((chat) =>
-          chat._id === message.chatId
-            ? {
-              ...chat,
-              latestMessage: {
-                text: message.text,
-                sender: message.sender,
-              },
-            }
-            : chat
-        )
-      );
-    };
-
-    socket.on("newMessage", handleNewMessage);
-
-    return () => socket.off("newMessage", handleNewMessage);
+    return () => socket.off("newMessage", handleNewMessageWrapper);
   }, [socket, selectedChat, setChats]);
 
+
+
+  function handleNewMessageWrapper(message) {
+    handleNewMessage(message, selectedChat, setMessages, setChats);
+  }
+
+  function handleNewMessage(message, selectedChat, setMessages, setChats) {
+    if (selectedChat._id === message.chatId) {
+      setMessages((prev) => [...prev, message]);
+    }
+
+    setChats((prev) => updateChatsWithNewMessage(prev, message));
+  }
+
+  function updateChatsWithNewMessage(chats, message) {
+    return chats.map((chat) => {
+      if (chat._id !== message.chatId) return chat;
+
+      return {
+        ...chat,
+        latestMessage: {
+          text: message.text,
+          sender: message.sender,
+        },
+      };
+    });
+  }
+
   return (
-    <div>  
+    <div>
       {selectedChat && (
-        <div className="flex flex-col h-[90vh]">
+        <div className="flex flex-col min-[868px]:h-[90vh] h-[115vh]">
           {/* Chat Header */}
           <div className="flex w-full h-12 items-center gap-3">
             <img
@@ -121,6 +121,21 @@ const MessageContainer = ({ selectedChat, setChats }) => {
       )}
     </div>
   );
+};
+MessageContainer.propTypes = {
+  selectedChat: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    users: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        profilePic: PropTypes.shape({
+          url: PropTypes.string.isRequired,
+        }).isRequired,
+      })
+    ).isRequired,
+  }),
+  setChats: PropTypes.func.isRequired,
 };
 
 export default MessageContainer;

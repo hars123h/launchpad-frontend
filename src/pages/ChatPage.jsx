@@ -5,22 +5,15 @@ import { FaSearch } from "react-icons/fa";
 import Chat from "../components/chat/Chat";
 import MessageContainer from "../components/chat/MessageContainer";
 import { SocketData } from "../context/SocketContext";
-import { useDispatch, useSelector } from "react-redux";
-import { createChat } from "../redux/chat/chatActions";
-import { setChats, setSelectedChat } from "../redux/chat/chatSlice";
+import { useDispatch } from "react-redux";
 import { API_BASE_URL } from "../baseUrl";
+import PropTypes from "prop-types";
 
 const ChatPage = ({ user }) => {
   const { createChat, selectedChat, setSelectedChat, chats, setChats } =
     ChatData();
 
   const dispatch = useDispatch();
-  // const { chats, selectedChat } = useSelector((state) => state.chat);
-
-  // console.log("Selected chats", chats)
-
-
-
   const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState(false);
@@ -56,15 +49,12 @@ const ChatPage = ({ user }) => {
   }, []);
 
   async function createNewChat(id) {
-    // await dispatch(createChat(id));
     createChat(id)
     setSearch(false);
     getAllChats();
   }
 
-  const { onlineUsers, socket } = SocketData();
-  // const { onlineUsers } = useSelector((state) => state.socket);
-
+  const { onlineUsers } = SocketData();
   return (
     <div className="w-full px-2 md:p-4">
       <div className="flex flex-col md:flex-row gap-4 mx-auto w-full">
@@ -95,7 +85,7 @@ const ChatPage = ({ user }) => {
                 <div className="max-h-[70vh] overflow-y-auto space-y-2">
                   {users?.length > 0 ? (
                     users.map((e) => (
-                      <div
+                      <button
                         key={e._id}
                         onClick={() => createNewChat(e._id)}
                         className="flex items-center gap-3 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer transition"
@@ -108,7 +98,7 @@ const ChatPage = ({ user }) => {
                         <span className="text-gray-800 font-medium truncate">
                           {e.name}
                         </span>
-                      </div>
+                      </button>
                     ))
                   ) : (
                     <p className="text-gray-500 text-sm">No users found</p>
@@ -143,6 +133,12 @@ const ChatPage = ({ user }) => {
       </div>
     </div>
   );
+};
+
+ChatPage.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default ChatPage;

@@ -50,7 +50,7 @@ export const likePost = createAsyncThunk("post/like", async (id) => {
             withCredentials: true,
         }
     );
-    // toast.success(data.message);
+    
     console.log("like/Unlike", data)
     return data.post;
 });
