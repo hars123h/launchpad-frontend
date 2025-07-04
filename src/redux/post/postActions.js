@@ -41,17 +41,18 @@ export const addPost = createAsyncThunk(
     }
 );
 
-// ✅ FIXED Like post
+
 export const likePost = createAsyncThunk("post/like", async (id) => {
     const { data } = await axios.post(
         `${API_BASE_URL}/api/post/like/${id}`,
-        null, // no body
+        null,
         {
             withCredentials: true,
         }
     );
-    toast.success(data.message);
-    return data;
+    // toast.success(data.message);
+    console.log("like/Unlike", data)
+    return data.post;
 });
 
 // Add comment
@@ -65,12 +66,12 @@ export const addComment = createAsyncThunk(
                 withCredentials: true,
             }
         );
-        toast.success(data.message);
+        toast.success("Comment Added");
         return data;
     }
 );
 
-// ✅ FIXED Delete post
+
 export const deletePost = createAsyncThunk("post/delete", async (id) => {
     const { data } = await axios.delete(`${API_BASE_URL}/api/post/${id}`, {
         withCredentials: true,
@@ -79,7 +80,7 @@ export const deletePost = createAsyncThunk("post/delete", async (id) => {
     return data;
 });
 
-// ✅ FIXED Delete comment
+
 export const deleteComment = createAsyncThunk(
     "post/deleteComment",
     async ({ id, commentId }) => {
@@ -89,7 +90,7 @@ export const deleteComment = createAsyncThunk(
                 withCredentials: true,
             }
         );
-        toast.success(data.message);
+        toast.success("Comment Deleted");
         return data;
     }
 );

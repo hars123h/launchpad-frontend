@@ -95,10 +95,9 @@ describe('Post Actions', () => {
   });
 
   describe('likePost', () => {
-    it('likes a post', async () => {
-      const mockResponse = { message: 'Liked' };
+    it('likes or unlikes a post', async () => {
+      const mockResponse = { message: 'Liked', post: { id: 1, liked: true } };
       axios.post.mockResolvedValueOnce({ data: mockResponse });
-      toast.success.mockImplementation(() => { });
 
       const result = await store.dispatch(likePost(1));
 
@@ -108,14 +107,23 @@ describe('Post Actions', () => {
         { withCredentials: true }
       );
 
-      expect(toast.success).toHaveBeenCalledWith('Liked');
-      expect(result.payload).toEqual(mockResponse);
+      expect(result.type).toBe('post/like/fulfilled');
+      expect(result.payload).toEqual(mockResponse.post);
+    });
+
+    it('handles like/unlike failure', async () => {
+      axios.post.mockRejectedValueOnce(new Error('Like failed'));
+
+      const result = await store.dispatch(likePost(1));
+
+      expect(result.type).toBe('post/like/rejected');
+      expect(result.error.message).toBe('Like failed');
     });
   });
 
   describe('addComment', () => {
     it('adds a comment', async () => {
-      const mockResponse = { message: 'Commented' };
+      const mockResponse = { message: 'Comment Added', comment: { id: 1, text: 'Nice!' } };
       axios.post.mockResolvedValueOnce({ data: mockResponse });
       toast.success.mockImplementation(() => { });
 
@@ -127,14 +135,14 @@ describe('Post Actions', () => {
         { withCredentials: true }
       );
 
-      expect(toast.success).toHaveBeenCalledWith('Commented');
+      expect(toast.success).toHaveBeenCalledWith('Comment Added');
       expect(result.payload).toEqual(mockResponse);
     });
   });
 
   describe('deletePost', () => {
     it('deletes a post', async () => {
-      const mockResponse = { message: 'Deleted' };
+      const mockResponse = { message: 'Deleted', id: 1 };
       axios.delete.mockResolvedValueOnce({ data: mockResponse });
       toast.success.mockImplementation(() => { });
 

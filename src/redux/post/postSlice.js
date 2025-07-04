@@ -90,6 +90,32 @@ const postSlice = createSlice({
       })
       .addCase(addPost.rejected, (state) => {
         state.addLoading = false;
+      })
+      .addCase(likePost.fulfilled, (state, action) => {
+        const updatedPost = action.payload;
+        const list = updatedPost.type === "reel" ? state.reels : state.posts;
+        const index = list.findIndex((p) => p._id === updatedPost._id);
+        console.log("Index", index);
+        if (index !== -1) {
+          list[index] = updatedPost; // Replace with updated post
+        }
+      })
+      .addCase(addComment.fulfilled, (state, action) => {
+        const updatedPost = action.payload;
+        const list = updatedPost.type === "reel" ? state.reels : state.posts;
+
+        const index = list.findIndex((p) => p._id === updatedPost._id);
+        if (index !== -1) {
+          list[index] = updatedPost;
+        }
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        const updatedPost = action.payload;
+        const list = updatedPost.type === "reel" ? state.reels : state.posts;
+        const index = list.findIndex((p) => p._id === updatedPost._id);
+        if (index !== -1) {
+          list[index] = updatedPost;
+        }
       });
   }
 });

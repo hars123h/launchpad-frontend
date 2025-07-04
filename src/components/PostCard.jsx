@@ -36,13 +36,23 @@ const PostCard = ({ type, value }) => {
     }
   }, [value, user._id]);
 
-  const likeHandler = async () => {
-    setIsLike(!isLike);
-    // dispatch(likePost(value._id));
-    const result = await dispatch(likePost(value._id));
-    if (likePost.fulfilled.match(result)) {
-      dispatch(fetchPosts({ cursor: null })); // only if needed
-    }
+  // const likeHandler = async () => {
+  //   setIsLike((prev) => !prev); // Optimistic UI update
+
+  //   const result = await dispatch(likePost(value._id));
+
+  //   if (likePost.fulfilled.match(result)) {
+  //     // ✅ You don't need to call fetchPosts here!
+  //     // Just update post.likes in reducer OR update isLike locally.
+  //   } else {
+  //     // Revert optimistic update on failure
+  //     setIsLike((prev) => !prev);
+  //   }
+  // };
+
+
+  const likeHandler = () => {
+    dispatch(likePost(value._id));
   };
 
   const [comment, setComment] = useState("");
@@ -54,7 +64,7 @@ const PostCard = ({ type, value }) => {
     if (addComment.fulfilled.match(result)) {
       setComment("");
       // setShow(false);
-      dispatch(fetchPosts({ cursor: null })); // only if needed
+      // dispatch(fetchPosts({ cursor: null })); // only if needed
     }
   };
 
@@ -79,20 +89,30 @@ const PostCard = ({ type, value }) => {
 
   const [caption, setCaption] = useState(value.caption ? value.caption : "");
   const [captionLoading, setCaptionLoading] = useState(false);
+  const [postData, setPostData] = useState(value);
+
 
   async function updateCaption() {
     setCaptionLoading(true);
     try {
-      const { data } = await axios.put(
+      const { data: updatedPost } = await axios.put(
         `${API_BASE_URL}/api/post/${value._id}`,
         { caption },
-        { withCredentials: true }  // ✅ Include cookies like auth token
+        { withCredentials: true }
       );
 
-      toast.success(data.message);
-      dispatch(fetchPosts({ cursor: null }));
+      toast.success("Caption updated");
+
+      // ✅ update the post in local UI
+      setPostData((prev) => ({
+        ...prev,
+        caption: updatedPost.caption, // or whatever is returned from backend
+      }));
+      setCaption(updatedPost?.caption)
+      // value.caption = updatedPost.caption;
       setShowInput(false);
     } catch (error) {
+      console.log("Error", error)
       toast.error(error.response?.data?.message || "Update failed");
     } finally {
       setCaptionLoading(false);
@@ -136,7 +156,7 @@ const PostCard = ({ type, value }) => {
             to={`/user/${value.owner._id}`}
           >
             <img
-              src={value.owner.profilePic.url}
+              src={value?.owner?.profilePic?.url}
               alt=""
               className="w-8 h-8 rounded-full"
             />
@@ -201,7 +221,7 @@ const PostCard = ({ type, value }) => {
               </button>
             </>
           ) : (
-            <p className="text-gray-800 mt-3">{value.caption}</p>
+            <p className="text-gray-800 mt-3">{postData?.caption}</p>
           )}
         </div>
 
@@ -228,7 +248,8 @@ const PostCard = ({ type, value }) => {
               onClick={likeHandler}
               className="text-red-500 text-2xl cursor-pointer"
             >
-              {isLike ? <IoHeartSharp /> : <IoHeartOutline />}
+              {value.likes.includes(user._id) ? <IoHeartSharp /> : <IoHeartOutline />}
+              {/* {isLike ? <IoHeartSharp /> : <IoHeartOutline />} */}
             </span>
             <button
               className="hover:bg-gray-50 rounded-full p-1"
@@ -299,15 +320,15 @@ export const Comment = ({ value, user, owner, id }) => {
   const deleteCommentHandler = async () => {
     const result = await dispatch(deleteComment({ id: id, commentId: value._id }));
 
-    if (deleteComment.fulfilled.match(result)) {
-      dispatch(fetchPosts({ cursor: null })); // only if needed
-    }
+    // if (deleteComment.fulfilled.match(result)) {
+    //   dispatch(fetchPosts({ cursor: null })); // only if needed
+    // }
   };
   return (
     <div className="flex items-center space-x-2 mt-2">
       <Link to={`/user/${value.user._id}`}>
         <img
-          src={value.user.profilePic.url}
+          src={value?.user?.profilePic?.url}
           className="w-8 h-8 rounded-full"
           alt=""
         />
